@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NIST Elliptic Curves Hash Guessing Challenge</title>
+    <style>
+        .monospace {
+            font-family: 'Courier New', Courier, monospace;
+        }
+        #hashList {
+            padding-left: 0;
+            list-style-type: none;
+        }
+    </style>
+</head>
+<body>
+    <div style="text-align: center; padding: 50px;">
+        <h2>NIST Elliptic Curves Hash Guessing Challenge</h2>
+        <p>Can you uncover the English sentences that generated the NIST elliptic curve seeds? Take the challenge!</p>
+        <input type="text" id="inputText" placeholder="Enter your guess here...">
+        <button onclick="checkGuess()">Check Guess</button>
+        <div id="outputResult"></div>
+        <div id="hashOutput" class="monospace"></div>
+    </div>
+
+    <div style="text-align: center; padding: 20px;">
+        <h3>Target SHA-1 Hashes:</h3>
+        <ul id="hashList" class="monospace">
+            <li>3045AE6FC8422F64ED579528D38120EAE12196D5</li>
+            <li>BD71344799D5C7FCDC45B59FA3B9AB8F6A948BC5</li>
+            <li>C49D360886E704936A6678E1139D26B7819F7E90</li>
+            <li>A335926AA319A27A1D00896A6773A4827ACDAC73</li>
+            <li>D09E8800291CB85396CC6717393284AAA0DA64BA</li>
+        </ul>
+        <p>For more context and the story behind this challenge, read the article <a href="https://words.filippo.io/dispatches/seeds-bounty/">here</a>.</p>
+    </div>
+
+    <script>
+        const targetHashes = [
+            "3045AE6FC8422F64ED579528D38120EAE12196D5",
+            "BD71344799D5C7FCDC45B59FA3B9AB8F6A948BC5",
+            "C49D360886E704936A6678E1139D26B7819F7E90",
+            "A335926AA319A27A1D00896A6773A4827ACDAC73",
+            "D09E8800291CB85396CC6717393284AAA0DA64BA"
+        ];
+
+        function checkGuess() {
+            const text = document.getElementById('inputText').value;
+            const hash = new TextEncoder().encode(text);
+            crypto.subtle.digest('SHA-1', hash).then(hashBuffer => {
+                const hashArray = Array.from(new Uint8Array(hashBuffer));
+                const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('').toUpperCase();
+                
+                document.getElementById('hashOutput').innerText = 'Your SHA-1: ' + hashHex;
+                
+                if (targetHashes.includes(hashHex)) {
+                    document.getElementById('outputResult').innerText = '✅ Correct!';
+                } else {
+                    document.getElementById('outputResult').innerText = '❌ Wrong guess!';
+                }
+            });
+        }
+    </script>
+</body>
+</html>
+
